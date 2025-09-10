@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Jayden Hewitt | Portfolio</title>
+<style>
+  :root {
+    --c1: red;
+    --c2: cyan;
+  }
+  body {
+    margin: 0;
+    background: black;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  /* Stripes layer */
+  .stripes {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(
+      to bottom,
+      var(--c1) 0 10px,
+      var(--c2) 10px 20px
+    );
+    animation: move-stripes 0.1s linear infinite;
+    z-index: 1;
+  }
+
+  /* Black centre screen */
+  .screen {
+    position: relative;
+    width: 70vw;
+    height: 70vh;
+    background: black;
+    z-index: 2; /* the central screen sits above the stripes layer */
+  }
+
+  /* Moves the background down 20px every cycle, creating a scrolling illusion */
+  @keyframes move-stripes {
+    0% { background-position: 0 0; }
+    100% { background-position: 0 20px; }
+  }
+</style>
+</head>
+<body>
+  <div class="stripes"></div>
+  <div class="screen"></div>
+
+<script>
+  function randomColor() {
+    const colors = ['red', 'cyan', 'yellow', 'blue', 'magenta', 'lime', 'orange', 'white'];
+    return colors[Math.floor(Math.random() * colors.length)];
+  }
+
+  // Keeps red/cyan for 2 seconds.
+  setTimeout(() => {
+    // Starts randomising colours every 200ms.
+    const interval = setInterval(() => {
+      document.documentElement.style.setProperty('--c1', randomColor());
+      document.documentElement.style.setProperty('--c2', randomColor());
+    }, 200);
+
+    // Stops randomising and redirects after ~2 seconds of randomness.
+    setTimeout(() => {
+      clearInterval(interval);
+      window.location.href = 'pages/home.html';
+    }, 2000); // randomises for 2 seconds.
+  }, 2000); // waits 2 seconds before randomising.
+</script>
+</body>
+</html>

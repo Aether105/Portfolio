@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js"></script>
+</head>
+
+<body>
+    <script>
+        let walker;
+
+        function setup() {
+            let cnv = createCanvas(550, 400);
+            cnv.style('background-color', '#bcbec2');
+            walker = new Walker();
+        }
+
+        function draw() { 
+            walker.step();
+            walker.show();
+        }
+
+        class Walker {
+            constructor() {
+
+                // Starts the walker in the centre of the canvas.
+                this.x = width / 2;
+                this.y = height / 2;
+            }
+
+            // Displays the walker as a point.
+            show() {
+                stroke(0);
+                strokeWeight(2);
+                point(this.x, this.y);
+            }
+
+            step() {
+                // Randomly chooses a direction: 0, 1, 2, or 3.
+                let choice = floor(random(4));
+
+                if (choice === 0) {
+                    this.x += +3;
+                } else if (choice === 1) {
+                    this.x += -3;
+                } else if (choice === 2) {
+                    this.y += +3;
+                } else {
+                    this.y += -3;
+                }
+            }
+        }
+
+    </script>
+</body>
+
+</html>

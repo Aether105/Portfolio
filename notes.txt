@@ -1,0 +1,19 @@
+randomness:
+A random walk is a mathematical process where something takes a sequence of steps in random directions. In this case, it’s a point that repeatedly moves up, down, left, or right with equal probability. Over time, these unpredictable moves create a wandering, path-like pattern.
+
+The Perlin noise walker is a smooth version of a random walk where a point’s motion is driven by Perlin noise instead of pure chance. Instead of jittery, unpredictable steps, the noise values produce continuous, organic movement across the canvas, giving the path a natural, fluid quality.
+
+vectors:
+This shows a ball smoothly follow the mouse cursor with physics-like motion, using acceleration and friction for easing, while keeping it constrained within the window boundaries.
+
+Here shows multiple balls chasing a moving target that randomly changes position every 2 seconds. Each ball accelerates smoothly towards the target with friction for easing, while also pushing away from other balls if they get too close, creating a collision-avoidance effect.
+
+forces:
+This sketch shows objects falling into a liquid region where they slow down due to drag. The drag force opposes their motion and depends on speed and mass, so lighter objects slow more than heavier ones, demonstrating fluid resistance.
+
+A single attractor exerts a gravitational-like pull on multiple independent movers. Each mover experiences a force directed towards the attractor and responds with smooth, physics-inspired motion on the canvas.
+
+oscillation:
+This simulates two objects (movers) connected by a spring. The spring applies a force based on its extension or compression, pulling the movers towards each other in a physically intuitive way. It visualises the dynamics of spring motion—stretching, contracting, and oscillating.
+
+A rectangle-shaped “mover” that smoothly steers towards the mouse. Each frame, it calculates a direction vector from its position to the mouse, uses that as acceleration, updates its velocity (capped at a top speed), and moves accordingly. The rectangle is drawn rotated to face its velocity, making it look like it’s orientated in the direction it’s travelling.

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js"></script>
+</head>
+<style>
+    .text {
+        text-align: center;
+        font-family: 'Inter', sans-serif;
+    }
+</style>
+
+<body>
+    <!--attracrtor.js-->
+    <script>
+        // An object for a draggable attractive body.
+
+        class Attractor {
+            constructor() {
+                this.position = createVector(width / 2, height / 2);
+                this.mass = 20;
+                this.G = 1;
+                this.dragOffset = createVector(0, 0);
+                this.dragging = false;
+                this.rollover = false;
+            }
+
+            attract(mover) {
+                // Calculates the direction of force.
+                let force = p5.Vector.sub(this.position, mover.position);
+                // Distance between the objects.
+                let distance = force.mag();
+                // Limiting the distance to eliminate "extreme" results for very close or very far objects.
+                distance = constrain(distance, 5, 25);
+
+                // Calculates the gravitional force magnitude.
+                let strength = (this.G * this.mass * mover.mass) / (distance * distance);
+                // Gets the force vector --> magnitude * direction.
+                force.setMag(strength);
+                return force;
+            }
+
+            show() {
+                strokeWeight(4);
+                stroke(0);
+                if (this.dragging) {
+                    fill(50);
+                } else if (this.rollover) {
+                    fill(100);
+                } else {
+                    fill(175, 200);
+                }
+                circle(this.position.x, this.position.y, this.mass * 2);
+            }
+
+            // The methods for mouse interaction.
+            handlePress(mx, my) {
+                let d = dist(mx, my, this.position.x, this.position.y);
+                if (d < this.mass) {
+                    this.dragging = true;
+                    this.dragOffset.x = this.position.x - mx;
+                    this.dragOffset.y = this.position.y - my;
+                }
+            }
+
+            handleHover(mx, my) {
+                let d = dist(mx, my, this.position.x, this.position.y);
+                if (d < this.mass) {
+                    this.rollover = true;
+                } else {
+                    this.rollover = false;
+                }
+            }
+
+            stopDragging() {
+                this.dragging = false;
+            }
+
+            handleDrag(mx, my) {
+                if (this.dragging) {
+                    this.position.x = mx + this.dragOffset.x;
+                    this.position.y = my + this.dragOffset.y;
+                }
+            }
+        }
+    </script>
+
+    <!--mover.js-->
+    <script>
+        class Mover {
+            constructor(x, y, m) {
+                this.mass = m;
+                this.radius = m * 8;
+                this.position = createVector(x, y);
+                this.velocity = createVector(1, 0);
+                this.acceleration = createVector(0, 0);
+            }
+            // Newton's 2nd law: F = M * A
+            // or A = F / M
+            applyForce(force) {
+                let f = p5.Vector.div(force, this.mass);
+                this.acceleration.add(f);
+            }
+
+            update() {
+                // The velocity changes according to the acceleration.
+                this.velocity.add(this.acceleration);
+                // The position changes by velocity.
+                this.position.add(this.velocity);
+                // Acceleration must be cleared each frame.
+                this.acceleration.mult(0);
+            }
+
+            show() {
+                stroke(0);
+                strokeWeight(2);
+                fill(127, 127);
+                circle(this.position.x, this.position.y, this.radius * 2);
+            }
+        }
+    </script>
+
+    <!--sketch.js-->
+    <script>
+        let movers = [];
+        let attractor;
+
+        function setup() {
+            pos = createCanvas(550, 400);
+            for (let i = 0; i < 10; i++) {
+                movers[i] = new Mover(random(width), random(height), random(0.5, 3));
+            }
+            attractor = new Attractor();
+        }
+
+        function draw() {
+            background('#bcbec2');
+
+            attractor.show();
+
+            for (let i = 0; i < movers.length; i++) {
+                let force = attractor.attract(movers[i]);
+                movers[i].applyForce(force);
+
+                movers[i].update();
+                movers[i].show();
+            }
+        }
+
+        function mouseMoved() {
+            attractor.handleHover(mouseX, mouseY);
+        }
+
+        function mousePressed() {
+            attractor.handlePress(mouseX, mouseY);
+        }
+
+        function mouseDragged() {
+            attractor.handleHover(mouseX, mouseY);
+            attractor.handleDrag(mouseX, mouseY);
+        }
+
+        function mouseReleased() {
+            attractor.stopDragging();
+        }
+    </script>
+
+    <div class="text">Click and drag the larger object.</div>
+</body>
+
+</html>

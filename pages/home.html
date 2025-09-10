@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jayden Hewitt | Home</title>
+<style>
+    /*@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');*/
+    
+    @font-face {
+        font-family: 'zxSpecFont';
+        src: url('ZX Spectrum.ttf') format('truetype');
+    }
+
+    body {
+        background: #bcbec2;
+        color: white;
+        text-align: center;
+        padding: 50px;
+    }
+
+    /* CRT scan line overlay */
+    body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        background: repeating-linear-gradient(
+            to bottom,
+            rgba(0, 0, 0, 0.05), /* faint dark line */
+            rgba(0, 0, 0, 0.05),
+            transparent 10px,
+            transparent 10px
+        );
+        mix-blend-mode: multiply;
+        z-index: 1000;
+        animation: crt-move 2s linear infinite; /* slow scrolling */
+    }
+
+    /* Animation for moving scan lines */
+    @keyframes crt-move {
+        0%   { background-position: 0 0; }
+        100% { background-position: 0 10px; } /* moves down slightly */
+    }
+
+    .both {
+        background-color: #bcbec2;
+        width: 500px;
+        height: 450px;
+        margin: auto;
+    }
+
+    h1 {
+        color: black;
+        text-shadow: 2px 2px rgb(218, 32, 32);
+        font-size: 2rem;
+        font-family: 'zxSpecFont';
+    }
+
+    .menu {
+        display: inline-block;
+        margin-top: 80px;
+        border: 4px solid black;
+        border-top-width: 10px;
+        padding: 30px ;
+        background: white;
+    }
+
+    .menu button {
+        display: block;
+        background: white;
+        color: black;
+        font-weight: bold;
+        font-family: 'zxSpecFont';
+        padding: 20px 30px;
+        margin: 5px auto;
+        cursor: pointer;
+        font-size: 1rem;
+    }
+
+    .menu button:hover {
+        background: #03fcf8;
+        color: black;
+    }
+
+    .menu .button-row {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+    }
+
+    .menu .button-row button {
+        display: inline-block;
+        margin: 0;
+    }
+
+    .projects-label {
+        font-size: 35px;
+        text-shadow: 2px 2px rgb(132, 141, 141);
+        font-weight: bold;
+        margin: 0 0 10px 0;
+        color: black;
+        font-family: 'zxSpecFont';
+    }
+
+</style>
+</head>
+<body>
+
+<div class="both">
+    <h1>Jayden Hewitt</h1>
+
+    <div class="menu">
+        <div class="projects-section">
+            <p class="projects-label">PROJECTS</p>
+            <div class="button-row">
+                <button id="p5">p5</button>
+                <button id="pixi">PIXI</button>
+            </div>
+        </div>
+        <button id="about-me">ABOUT ME</button>
+    </div>
+</div>
+
+
+<script>
+    const p5Projects = document.querySelector('#p5');
+    p5Projects.addEventListener('click', () => {
+        window.location.href = "p5-projects.html";
+    })
+
+    const pixiProjects = document.querySelector('#pixi');
+    pixiProjects.addEventListener('click', () => {
+        window.location.href = "pixi-projects.html";
+    })
+
+    const aboutMe = document.querySelector('#about-me');
+    aboutMe.addEventListener('click', () => {
+        window.location.href = "about-me.html";
+    })
+
+</script>
+
+</body>
+</html>

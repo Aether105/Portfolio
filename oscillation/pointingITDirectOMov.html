@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js"></script>
+</head>
+
+<body>
+    <!--sketch.js-->
+    <script>
+        let mover;
+
+        function setup() {
+            createCanvas(550, 400);
+            mover = new Mover();
+        }
+
+        function draw() {
+            background('#bcbec2');
+            mover.update();
+            mover.checkEdges();
+            mover.display();
+        }
+    </script>
+
+    <!--mover.js-->
+    <script>
+        class Mover {
+            constructor() {
+                this.position = createVector(width / 2, height / 2);
+                this.velocity = createVector(0, 0);
+                this.acceleration = 0;
+                this.topspeed = 4;
+                this.xoff = 1000;
+                this.yoff = 0;
+                this.r = 16;
+            }
+
+            update() {
+                let mouse = createVector(mouseX, mouseY);
+                let dir = p5.Vector.sub(mouse, this.position);
+                dir.normalize();
+                dir.mult(0.5);
+                this.acceleration = dir;
+
+                this.velocity.add(this.acceleration);
+                this.velocity.limit(this.topspeed);
+                this.position.add(this.velocity);
+            }
+
+            display() {
+                let angle = this.velocity.heading();
+
+                stroke(0);
+                strokeWeight(2);
+                fill(127);
+                push();
+                rectMode(CENTER);
+
+                translate(this.position.x, this.position.y);
+                rotate(angle);
+                rect(0, 0, 30, 10);
+
+                pop();
+            }
+
+            checkEdges() {
+                if (this.position.x > width) {
+                    this.position.x = 0;
+                } else if (this.position.x < 0) {
+                    this.position.x = width;
+                }
+
+                if (this.position.y > height) {
+                    this.position.y = 0;
+                } else if (this.position.y < 0) {
+                    this.position.y = height;
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>

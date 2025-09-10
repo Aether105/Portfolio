@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/pixi.js@8.12.0/dist/pixi.min.js"></script>
+</head>
+
+<body>
+    <script>
+
+
+        (async () => {
+            const app = new PIXI.Application();
+            await app.init({
+                background: '#bcbec2',
+                width: window.innerWidth,
+                height: window.innerHeight,
+            });
+            document.body.appendChild(app.canvas);
+
+            // --- Loads car sprites ---
+            await PIXI.Assets.load([
+                { alias: "carBlue", src: "./blueCar.png" },
+                { alias: "carGreen", src: "./greenCar.png" }
+            ]);
+
+            // --- Target's setup (red square) ---
+            const targetSize = 22;
+            const target = new PIXI.Graphics()
+                .rect(-targetSize * 0.5, -targetSize * 0.5, targetSize, targetSize)
+                .fill(0xff0000);
+            target.x = app.screen.width * 0.5;
+            target.y = app.screen.height * 0.5;
+            app.stage.addChild(target);
+
+            // --- Target's wandering velocity ---
+            let tvx = 0;
+            let tvy = 0;
+
+            function updateTarget() {
+                // Random wandering force.
+                tvx += (Math.random() - 0.5) * 0.4;
+                tvy += (Math.random() - 0.5) * 0.4;
+
+                // clamp speed.
+                const maxSpeed = 2;
+                const speed = Math.hypot(tvx, tvy);
+                if (speed > maxSpeed) {
+                    tvx = (tvx / speed) * maxSpeed;
+                    tvy = (tvy / speed) * maxSpeed;
+                }
+
+                target.x += tvx;
+                target.y += tvy;
+
+                // wraps edges around the screen, so if it goes off left, it reappears on the right.
+                if (target.x < 0) target.x = app.screen.width;
+                if (target.x > app.screen.width) target.x = 0;
+                if (target.y < 0) target.y = app.screen.height;
+                if (target.y > app.screen.height) target.y = 0;
+            }
+
+            // --- Car class ---
+            class Car {
+                constructor(texture, x, y) {
+                    this.sprite = new PIXI.Sprite(texture);
+                    this.sprite.anchor.set(0.5);
+                    this.sprite.scale.set(0.05); // car size.
+                    app.stage.addChild(this.sprite);
+
+                    this.x = x;
+                    this.y = y;
+                    this.vx = 0;
+                    this.vy = 0;
+
+                    this.maxSpeed = 3;
+                    this.accel = 0.2;
+                    this.rotationSpeed = 0.1;
+
+                    // Offset so the front of the car points towards the velocity.
+                    this.HEADING_OFFSET = -Math.PI * 0.5;
+                }
+
+                updateTowards(tx, ty) {
+                    const dx = tx - this.x;
+                    const dy = ty - this.y;
+                    const dist = Math.hypot(dx, dy);
+                    let ax = 0;
+                    let ay = 0;
+                    if (dist > 0) {
+                        ax = (dx / dist) * this.accel;
+                        ay = (dy / dist) * this.accel;
+                    }
+
+                    this.vx += ax;
+                    this.vy += ay;
+
+                    // Limits the velocity.
+                    const vMag = Math.hypot(this.vx, this.vy);
+                    if (vMag > this.maxSpeed) {
+                        this.vx = (this.vx / vMag) * this.maxSpeed;
+                        this.vy = (this.vy / vMag) * this.maxSpeed;
+                    }
+
+                    this.x += this.vx;
+                    this.y += this.vy;
+
+                    this.sprite.x = this.x;
+                    this.sprite.y = this.y;
+
+                    // Smooth rotation towards the velocity direction.
+                    const desired = Math.atan2(this.vy, this.vx) + this.HEADING_OFFSET;
+                    let diff = desired - this.sprite.rotation;
+                    diff = Math.atan2(Math.sin(diff), Math.cos(diff)); // wrap
+                    this.sprite.rotation += diff * this.rotationSpeed;
+                }
+
+                // Collision avoidance between the cars.
+                separate(other, minDist) {
+                    const dx = this.x - other.x;
+                    const dy = this.y - other.y;
+                    const d = Math.hypot(dx, dy);
+                    if (d > 0 && d < minDist) {
+                        const overlap = (minDist - d) / d;
+                        this.x += dx * overlap * 0.5;
+                        this.y += dy * overlap * 0.5;
+                        other.x -= dx * overlap * 0.5;
+                        other.y -= dy * overlap * 0.5;
+                    }
+                }
+            }
+
+            const car1 = new Car(PIXI.Assets.get("carBlue"), 300, 300);
+            const car2 = new Car(PIXI.Assets.get("carGreen"), 400, 400);
+            const cars = [car1, car2];
+
+            // --- Main loop ---
+            app.ticker.add(() => {
+                updateTarget();
+
+                // Moves the cars towards the target.
+                for (const c of cars) {
+                    c.updateTowards(target.x, target.y);
+
+                    // Collision with target will respawns target randomly.
+                    const dx = target.x - c.x;
+                    const dy = target.y - c.y;
+                    if (Math.hypot(dx, dy) < 30) {
+                        target.x = Math.random() * app.screen.width;
+                        target.y = Math.random() * app.screen.height;
+                        tvx = 0;
+                        tvy = 0;
+                    }
+                }
+
+                // Makes sure the cars avoid each other.
+                for (let i = 0; i < cars.length; i++) {
+                    for (let j = i + 1; j < cars.length; j++) {
+                        cars[i].separate(cars[j], 70);
+                    }
+                }
+            });
+        })();
+    </script>
+</body>
+
+</html>

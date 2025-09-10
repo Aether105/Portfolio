@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jayden Hewitt | p5-Projects</title>
+<style>
+    @font-face {
+        font-family: 'zxSpecFont';
+        src: url('ZX Spectrum.ttf') format('truetype');
+    }
+
+    body {
+        background: #bcbec2;
+        color: white;
+        text-align: center;
+        padding: 0px;
+    }
+
+    button {
+        background-color: #03fcf8;
+        border-radius: 4px;
+        width: 10%;
+        height: 25px;
+        font-size: 13px;
+        font-weight: bold;
+        font-family: 'zxSpecFont';
+    }
+
+    button:hover {
+        transform: translateY(-2px); /* Slight lift effect on hover */
+    }
+
+    #projectsiframe {
+        margin-top: 1%;
+    }
+</style>
+<body>
+    <!-- Top Menu -->
+    <div id="menu">
+        <button onclick="loadPage('home.html')">Home</button>
+        <button onclick="loadPage('p5-projects-welcome.html')">Welcome</button>
+        <button onclick="loadPage('randomness.html')">Randomness</button>
+        <button onclick="loadPage('vectors.html')">Vectors</button>
+        <button onclick="loadPage('forces.html')">Forces</button>
+        <button onclick="loadPage('oscillation.html')">Oscillation</button>
+    </div>
+
+    <!-- Bottom Content -->
+    <div id="projectsContent">
+        <iframe id="projectsiframe" src="p5-projects-welcome.html" width="100%" height="600px" frameborder="0"></iframe>
+    </div>
+
+</body>
+
+<script>
+  function loadPage(page) {
+    if (page == "home.html") {
+        window.location.href = 'home.html';
+    } else {
+        document.getElementById('projectsiframe').src = page;
+    }
+  }
+</script>

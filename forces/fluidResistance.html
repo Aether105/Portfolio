@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js"></script>
+</head>
+<style>
+    .text {
+        text-align: center;
+        font-family: 'Inter', sans-serif;
+    }
+</style>
+
+<body>
+    <!--sketch.js-->
+    <script>
+        let movers = [];
+        let liquid;
+
+        function setup() {
+            let cnv = createCanvas(500, 350);
+            cnv.style('background-color', '#bcbec2');
+            reset();
+            // Creates a liquid object.
+            liquid = new Liquid(25, height * 0.5, width, height * 0.5, 0.1);
+        }
+
+        function draw() {
+            background('#bcbec2');
+
+            // Draws the liquid.
+            liquid.show();
+
+            for (let i = 0; i < movers.length; i++) {
+                // Is the Mover in the liquid?
+                if (liquid.contains(movers[i])) {
+                    // Calculates the drag force.
+                    let dragForce = liquid.calculateDrag(movers[i]);
+                    // Applies the drag force to Mover.
+                    movers[i].applyForce(dragForce);
+                }
+
+                // Gravity is scaled by mass here.
+                let gravity = createVector(0, 0.1 * movers[i].mass);
+                // Applies gravity.
+                movers[i].applyForce(gravity);
+
+                // Updates and displays.
+                movers[i].update();
+                movers[i].show();
+                movers[i].checkEdges();
+            }
+        }
+
+        function mousePressed() {
+            reset();
+        }
+
+        // Restarts all the Mover objects randomly.
+        function reset() {
+            for (let i = 0; i < 9; i++) {
+                movers[i] = new Mover(40 + i * 70, 0, random(0.5, 3));
+            }
+        }
+    </script>
+
+    <!--mover.js-->
+    <script>
+        class Mover {
+            constructor(x, y, m) {
+                this.mass = m;
+                this.radius = m * 8;
+                this.position = createVector(x, y);
+                this.velocity = createVector(0, 0);
+                this.acceleration = createVector(0, 0);
+            }
+            // Newton's 2nd law: F = M * A
+            // or A = F / M
+            applyForce(force) {
+                let f = p5.Vector.div(force, this.mass);
+                this.acceleration.add(f);
+            }
+
+            update() {
+                // Velocity changes according to acceleration.
+                this.velocity.add(this.acceleration);
+                // The Position changes by velocity.
+                this.position.add(this.velocity);
+                // Acceleration must be cleared each frame.
+                this.acceleration.mult(0);
+            }
+
+            show() {
+                stroke(0);
+                strokeWeight(2);
+                fill(127, 127);
+                circle(this.position.x, this.position.y, this.radius * 2);
+            }
+
+            // Checks for bouncing off the bottom of the window.
+            checkEdges() {
+                if (this.position.y > height - this.radius) {
+                    this.velocity.y *= -0.9; // A little dampening when hitting the bottom.
+                    this.position.y = height - this.radius;
+                }
+            }
+        }
+    </script>
+
+    <!--liquid.js-->
+    <script>
+        class Liquid {
+            constructor(x, y, w, h, c) {
+                this.x = x;
+                this.y = y;
+                this.w = w;
+                this.h = h;
+                this.c = c;
+            }
+
+            // Is the Mover in the Liquid?
+            contains(mover) {
+                let pos = mover.position;
+                return (
+                    pos.x > this.x &&
+                    pos.x < this.x + this.w &&
+                    pos.y > this.y &&
+                    pos.y < this.y + this.h
+                );
+            }
+
+            // Calculates the drag force.
+            calculateDrag(mover) {
+                // Magnitude is coefficient * speed squared.
+                let speed = mover.velocity.mag();
+                let dragMagnitude = this.c * speed * speed;
+
+                // Direction is the inverse of velocity.
+                let dragForce = mover.velocity.copy();
+                dragForce.mult(-1);
+
+                // Scales according to magnitude.
+                dragForce.setMag(dragMagnitude);
+                return dragForce;
+            }
+
+            show() {
+                noStroke();
+                fill(175);
+                rect(this.x, this.y, this.w, this.h);
+            }
+        }
+    </script>
+
+    <div class="text">Click the mouse to restart the sketch.</div>
+</body>
+
+</html>

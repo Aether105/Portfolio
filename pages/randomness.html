@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js"></script>
+</head>
+<style>
+    body {
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center; /* Centres horizontally */
+        align-items: center; /* Centres vertically */
+        font-family: 'Inter', sans-serif;
+        background-color: #bcbec2;
+        padding: 100px 20px 20px 20px; /* padding-top is set to 100px to lower content */
+        box-sizing: border-box; /* Includes padding in the element's total width and height */
+        overflow: hidden;
+    }
+
+    .overall-container {
+        display: flex;
+        gap: 100px; /* Space between the simulation groups */
+        flex-wrap: wrap; /* Allows the groups to wrap onto the next line on smaller screens */
+        justify-content: center; /* Centres groups horizontally when they wrap */
+    }
+
+    .simulation-group { /* This wraps the h2, the iframe, button, and textbox */
+        position: relative;
+        display: flex;
+        flex-direction: column; /* Stacks the title, random-wrapper, and button */
+        align-items: center;
+        margin-bottom: 100px; /* Space below each simulation group */
+    }
+
+    .simulation-group h2 { /* Styling for the title above the frame */
+        margin-bottom: 15px; /* Space between the title and the grey frame */
+        margin-top: 0;
+        color: #374151;
+        font-size: 1.5rem;
+    }
+
+    .random-wrapper { /* This class holds the visual "frame" (iframe inside) */
+        padding: 20px; /* Padding inside the grey frame */
+        background-color: #d1d5db; /* Grey background for the "frame" */
+        border: 1px solid #ccc; /* Border for the frame */
+        border-radius: 8px; /* Rounded corners for the frame */
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        display: flex;
+        flex-direction: column; /* Stacks iframe (only if multiple elements were here) */
+        align-items: center; /* Centres iframe horizontally within the frame */
+        text-align: center; /* Centres content within the frame */
+    }
+
+    iframe {
+        width: 550px;
+        height: 400px;
+        display: block; /* Removes extra space below the iframe */
+        border-radius: 8px;
+        border-color: #374151;
+        background-color: #bcbec2;
+    }
+
+    /* Styles for the info button */
+    .info-button {
+        padding: 12px 24px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #374151;
+        background-color: #03fcf8;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: transform 0.2s ease; /* Smooth hover effects */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+        z-index: 10;
+        margin-top: 25px; /* Space between the iframe and the button */
+    }
+
+    .info-button:hover {
+        transform: translateY(-2px); /* Slight lift effect on hover */
+    }
+
+    .info-button:active {
+        transform: translateY(0); /* Press effect when clicked */
+    }
+
+    /* Styles for the text box that appears */
+    .text-box {
+        position: fixed; /* Positions the text box relative to the viewport, ensuring it stays on screen */
+        border: 1px solid #d1d5db;
+        padding: 15px;
+        border-radius: 8px;
+        background-color: #ffffff;
+        color: #374151;
+        font-size: 1rem;
+        width: auto; /* Allows width to adjust based on content and max-width */
+        max-width: 300px; /* Maximum width to keep the text box neat */
+        line-height: 1.5; /* Line spacing for readability */
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        top: 0;
+        left: 0;
+        transform: translate(-50%, -50%); /* Starts off-screen */
+    }
+
+    /* Utility class to hide the element initially */
+    .hidden {
+        display: none;
+    }
+</style>
+
+<body>
+
+    <div class="overall-container">
+        <!-- First simulation group -->
+        <div class="simulation-group">
+            <h2>Random Walker</h2>
+            <div class="random-wrapper">
+                <iframe src="../randomness/randomWalker.html" scrolling="no"></iframe>
+            </div>
+            <!-- The info button -->
+            <button id="info-b1" class="info-button">Show Info</button>
+            <div id="infoTextBox1" class="text-box hidden">
+              A random walk is a mathematical process where something takes a sequence of steps in random directions. In this case, it’s a point that repeatedly moves up, down, left, or right with equal probability. Over time, these unpredictable moves create a wandering, path-like pattern.
+            </div>
+        </div>
+
+        <!-- Second simulation group -->
+        <div class="simulation-group">
+            <h2>Perlin Noise Walker</h2>
+            <div class="random-wrapper">
+                <iframe src="../randomness/perlinWalker.html" scrolling="no"></iframe>
+            </div>
+            <!-- The info button for the second iframe -->
+            <button id="info-b2" class="info-button">Show Info</button>
+            <div id="infoTextBox2" class="text-box hidden">
+                The Perlin noise walker is a smooth version of a random walk where a point’s motion is driven by Perlin noise instead of pure chance. Instead of jittery, unpredictable steps, the noise values produce continuous, organic movement across the canvas, giving the path a natural, fluid quality.
+            </div>
+        </div>
+    </div>
+
+</body>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Function to handle the toggle logic for a specific button and text box.
+        const setupToggleButton = (buttonId, textBoxId) => {
+            const toggleButton = document.getElementById(buttonId);
+            const infoTextBox = document.getElementById(textBoxId);
+
+            if (toggleButton && infoTextBox) {
+                // Function to position the text box dynamically on the screen.
+                const positionTextBox = () => {
+                    const buttonRect = toggleButton.getBoundingClientRect(); // Gets the button's size and position relative to viewport.
+                    const textBoxRect = infoTextBox.getBoundingClientRect(); // Gets the text box's size (after being made visible).
+
+                    const gap = 15; // The space between the button and the text box.
+                    const viewportPadding = 20; // Minimum padding from viewport edges.
+
+                    let targetX;
+                    let targetY;
+
+                    // Calculates the horizontal position (centred under the button, then adjusts for screen edges).
+                    targetX = buttonRect.left + (buttonRect.width * 0.5); // Centres the X coordinate of the button.
+
+                    // Adjusts if the textbox would go off screen to the left.
+                    if (targetX - (textBoxRect.width * 0.5) < viewportPadding) {
+                        targetX = viewportPadding + (textBoxRect.width * 0.5);
+                    }
+                    // Adjusts if the textbox would go off screen to the right.
+                    else if (targetX + (textBoxRect.width * 0.5) > window.innerWidth - viewportPadding) {
+                        targetX = window.innerWidth - viewportPadding - (textBoxRect.width * 0.5);
+                    }
+
+
+                    // Calculates the vertical position (above the button, then adjusts for screen edges).
+                    targetY = buttonRect.top - gap - (textBoxRect.height * 0.5); // Positions above the button.
+
+                    // Adjusts if the textbox would go off screen at the top.
+                    if (targetY - (textBoxRect.height * 0.5) < viewportPadding) {
+                        // If it goes off top, positions it below the button instead.
+                        targetY = buttonRect.bottom + gap + (textBoxRect.height * 0.5);
+                        // Checks if it now goes off the bottom of the screen.
+                        if (targetY + (textBoxRect.height * 0.5) > window.innerHeight - viewportPadding) {
+                            // If it goes off bottom too, centres it vertically as best as possible.
+                            targetY = window.innerHeight * 0.5;
+                        }
+                    }
+                    // Adjusts if the textbox would go off the bottom (this can happen if the window is very short).
+                    else if (targetY + (textBoxRect.height * 0.5) > window.innerHeight - viewportPadding) {
+                         targetY = window.innerHeight - viewportPadding - (textBoxRect.height * 0.5);
+                         // After adjusting for the bottom, if it still goes off top, then it centres vertically.
+                         if (targetY - (textBoxRect.height * 0.5) < viewportPadding) {
+                             targetY = window.innerHeight * 0.5;
+                         }
+                    }
+
+
+                    // Applies positions using transform to centre the textbox around targetX, targetY.
+                    infoTextBox.style.left = `${targetX}px`;
+                    infoTextBox.style.top = `${targetY}px`;
+                    infoTextBox.style.transform = `translate(-50%, -50%)`; // Centres the element around its (left, top) point.
+                };
+
+                toggleButton.addEventListener('click', () => {
+                    infoTextBox.classList.toggle('hidden'); // Toggles the 'hidden' class, showing or hiding the text box.
+
+                    // If the text box is now visible, it calculates and set its position.
+                    if (!infoTextBox.classList.contains('hidden')) {
+                        positionTextBox();
+                    }
+
+                    // Changes the button text based on whether the text box is visible or hidden.
+                    if (infoTextBox.classList.contains('hidden')) {
+                        toggleButton.textContent = 'Show Info';
+                    } else {
+                        toggleButton.textContent = 'Hide Info';
+                    }
+                });
+
+                // Adds a resize event listener to ensure the text box repositions correctly if the window is resized.
+                window.addEventListener('resize', () => {
+                    // Only repositions it if the text box is currently visible.
+                    if (!infoTextBox.classList.contains('hidden')) {
+                        positionTextBox();
+                    }
+                });
+
+            } else {
+                console.error(`Required HTML elements for ${buttonId} (button or text box) were not found.`);
+            }
+        };
+
+        // Setup for the info buttons for both frames.
+        setupToggleButton('info-b1', 'infoTextBox1');
+        setupToggleButton('info-b2', 'infoTextBox2');
+    });
+</script>
+</html>

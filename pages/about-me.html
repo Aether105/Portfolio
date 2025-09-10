@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jayden Hewitt | About me</title>
+<style>
+    body {
+        background: #bcbec2;
+        color: white;
+        text-align: center;
+        padding: 50px;
+    }
+
+    /* CRT scan line overlay */
+    body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        background: repeating-linear-gradient(
+            to bottom,
+            rgba(0, 0, 0, 0.05), /* faint dark line */
+            rgba(0, 0, 0, 0.05),
+            transparent 10px,
+            transparent 10px
+        );
+        mix-blend-mode: multiply;
+        z-index: 1000;
+        animation: crt-move 2s linear infinite; /* slow scrolling */
+    }
+
+    /* Animation for moving scan lines */
+    @keyframes crt-move {
+        0%   { background-position: 0 0; }
+        100% { background-position: 0 10px; } /* moves down slightly */
+    }
+
+    p {
+        color: black;
+        font-size: 29px;
+        font-family:Verdana, Geneva, Tahoma, sans-serif;
+    }
+</style>
+<body>
+    <p>Hi, I'm Jayden Hewitt.</p>
+
+    <p>I’m an 18-year-old aspiring software developer with a passion for coding, retro technology, and films. Although I do not have industry experience yet, I am eager to apply the skills I have gained through personal projects to a professional setting.</p>
+
+    <p>Lately, I have been working with p5.js and Pixi.js to create interactive content and animations. I enjoy experimenting with how code can express ideas in a playful way.</p>
+
+    <p>Beyond coding, I love exploring retro tech - from that of the NES to the ZX Spectrum +2 - and I’m often inspired by the design and limitations of it. I’m also a film enthusiast, and I find that storytelling, visuals, and atmosphere in cinema often spark new ideas for my projects.</p>
+
+    <p>This portfolio is my space to document my learning journey, showcase experiments, and share the projects I am building as I work towards becoming a software developer.</p>
+</body>
